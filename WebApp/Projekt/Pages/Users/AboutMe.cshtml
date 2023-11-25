@@ -1,0 +1,184 @@
+﻿@page
+@model Projekt.Pages.Users.AboutMeModel
+@{
+    string? name = HttpContext.Session.GetString("Name");
+    string? surname = HttpContext.Session.GetString("Surname");
+    string? email = HttpContext.Session.GetString("Email");
+    string? observed = HttpContext.Session.GetString("ObservedCategory");
+    string? phone = HttpContext.Session.GetString("PhoneNumber");
+}
+
+<div class="card" style="border-radius:20px">
+    <h2 class=" display-5 fw-bold text-body-emphasis rounded text-center  p-3">My account</h2>
+</div>
+
+<br />
+@if(Model.errorMessage.Length > 0 )
+{
+    <div class='alert alert-warning alert-dismissible fade show text-center' role='alert'>
+        <strong>@Model.errorMessage</strong>
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>
+}
+else if (Model.successMessage.Length > 0)
+{
+    <div class='alert alert-success alert-dismissible fade show text-center' role='alert'>
+        <strong>@Model.successMessage</strong>
+        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+    </div>
+}
+<br />
+<div class="card" style="border-radius:20px; max-width:500px; align-content:center; margin:auto">
+    <div class="card-body">
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item fontItem">Name: @name</li>
+        <li class="list-group-item fontItem">Surname: @surname</li>
+        <li class="list-group-item fontItem">E-mail: @email</li>
+        <li class="list-group-item fontItem">Observed Category: @observed</li>
+        <li class="list-group-item fontItem">Phone Number: @phone</li>
+    </ul>
+    <br />
+        <div class="row mb-3">
+            <div class="col d-grid">
+                <button type="button" style="border-radius:20px" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#EditModal">Edit</button>
+            </div>
+            <div class="col d-grid">
+                <button type="button" class="btn btn-outline-danger" style="border-radius:20px" data-bs-toggle="modal" data-bs-target="#DeleteModal">Delete account</button>
+            </div>
+            <div class="col d-grid">
+                <a class="btn btn-outline-secondary" style="border-radius:20px" href="/CRUD" role="button">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                    <h5 class="modal-title" style="align-content:center" id="exampleModal">Edit Profile</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label text-center">Name</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" asp-for="Name">
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label text-center">Surname</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" asp-for="Surname">
+                            <span asp-validation-for="Surname" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label  text-center ">E-mail</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" asp-for="Email">
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label  text-center ">Phone Number</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center " style="border-radius:20px" asp-for="PhoneNumber">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <label class="col-sm-4 col-form-label  text-center ">Observed Category</label>
+                        <div class="col-sm-8">
+                            <select class="form-select text-center " style="border-radius:20px" asp-for="ObservedCategory">
+                                <option value="Any">
+                                    Any
+                                </option>
+                                <option value="Books">
+                                    Books
+                                </option>
+                                <option value="Bikes">
+                                    Bikes
+                                </option>
+                                <option value="Cars">
+                                    Cars
+                                </option>
+                                <option value="Phones">
+                                    Phones
+                                </option>
+                            </select>
+                            <span asp-validation-for="ObservedCategory" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <button type="submit" class="btn btn-outline-primary" style="border-radius:20px" name="action" value="profile">Submit</button>
+                    </div>
+
+                    <hr />
+
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label text-center">Password</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" type="password" asp-for="Password">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label  text-center ">Confirm Password</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" type="password" asp-for="ConfirmPassword">
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <button type="submit" class="btn btn-outline-primary" style="border-radius:20px" name="action" value="password">Submit</button>
+                    </div>
+
+                </form>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="DeleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center" id="exampleModal">Are you sure you want to delete your account ?</h5>
+            </div>
+            <div class="modal-body">
+                <form method="post">
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label text-center">Password</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" type="password" asp-for="Password">
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-sm-4 col-form-label  text-center ">Confirm Password</label>
+                        <div class="col-sm-8">
+                            <input class="form-control text-center" style="border-radius:20px" type="password" asp-for="ConfirmPassword">
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <button type="submit" class="btn btn-outline-primary" style="border-radius:20px" name="action" value="delete">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

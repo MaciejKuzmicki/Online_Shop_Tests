@@ -1,0 +1,96 @@
+﻿@page
+@model Projekt.Pages.Users.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+
+<div class="row">
+    
+    <div class="card mx-auto text-center col-lg-5" style="padding:20px; border-radius:20px">
+        <h2 class="text-center mb-5">Please, enter your data</h2>
+        <form method="post">
+            @if (Model.errorMessage.Length > 0)
+            {
+                <div class='alert alert-warning alert-dismissible fade show' role='alert'>
+                    <strong>@Model.errorMessage</strong>
+                    <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                </div>
+            }
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input class="form-control" style="border-radius:20px" asp-for="User.Name" placeholder="Enter your name" />
+            <span asp-validation-for="User.Name" class="text-danger"></span>
+            <br />
+            <input class="form-control" style="border-radius:20px" asp-for="User.Surname" placeholder="Enter your surname" />
+            <span asp-validation-for="User.Surname" class="text-danger"></span>
+            <br />
+            <input class="form-control" style="border-radius:20px" asp-for="User.Email" placeholder="Enter your e-mail" />
+            <span asp-validation-for="User.Email" class="text-danger"></span>
+            <br />
+            <input class="form-control" style="border-radius:20px" asp-for="User.Password" type="password" placeholder="Enter your password" />
+            <span asp-validation-for="User.Password" class="text-danger"></span>
+            <br />
+            <div class="form-text" id="basic-addon4" style="text-align:left">Enter the category you want to observe</div>
+
+            <select id="observedCategory" class="form-select" style="border-radius:20px" asp-for="User.ObservedCategory">
+                <option value="Any" style="border-radius:20px">Any</option>
+                <option value="Books">Books</option>
+                <option value="Bikes">Bikes</option>
+                <option value="Cars">Cars</option>
+                <option value="Phones">Phones</option>
+            </select>
+
+            <span asp-validation-for="User.ObservedCategory" class="text-danger"></span>
+            <br />
+            <input class="form-control" style="border-radius:20px" asp-for="User.PhoneNumber" placeholder="Enter your phone number" />
+            <span asp-validation-for="User.PhoneNumber" class="text-danger"></span>
+            <br />
+            <div class="row mb-3">
+                <div class="col d-grid">
+                    <button type="submit" class="btn btn-outline-primary" style="border-radius:20px" href="/Index">Register</button>
+                </div>
+                <div class="col d-grid">
+                    <a asp-page="Index" class="btn btn-outline-secondary" style="border-radius:20px">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+
+    <div class="col-lg-5">
+
+    
+        <div class="card" style="border-radius:20px; max-height:200px">
+            <div class="card-body">
+                <h5>Reasons to have an account</h5>
+                <ul class="list-group-flush list-group" style="">
+                    <li class="list-group-item" style="">Possibility to add an item</li>
+                    <li class="list-group-item" style="">Possibility to watch chosen category</li>
+                </ul>
+            </div>
+        </div>
+
+        <br />
+
+        <div class="card" style="border-radius:20px">
+            <div class="card-body">
+                <h5 class="text-center">Already have an account ?</h5>
+                <br />
+                <div class="d-grid">
+                    <a class="btn btn-outline-primary" style="align-content:center; border-radius:20px" asp-area="" asp-page="/Users/Login">Login now!</a>
+
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+   
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

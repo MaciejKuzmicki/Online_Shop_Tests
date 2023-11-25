@@ -1,0 +1,91 @@
+﻿@page
+@model Projekt.CRUD.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="card" style="border-radius:20px">
+    <h2 class=" display-5 fw-bold text-body-emphasis rounded text-center  p-3">Edit</h2>
+</div>
+<br />
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="col-md-12 card" style="border-radius:20px">
+        <div class="row">
+            <div class="col-lg-5">
+                <img src="data:image/jpg;base64,@Model.Item.ImageData" class="img-fluid" alt="Item Image" style="border-radius:20px; max-height:600px">
+            </div>
+            
+            <div class="col-lg-7">
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-text" id="basic-addon4" style="text-align:left">Name</div>
+                        <input class="form-control text-center" style="border-radius:20px" asp-for="Name" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                    <div class="col">
+                        <div class="form-text" id="basic-addon4" style="text-align:left">Price</div>
+                        <input class="form-control text-center" style="border-radius:20px" asp-for="Price" placeholder="Enter the price" />
+                        <span asp-validation-for="Price" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-text" id="basic-addon4" style="text-align:left">State</div>
+                        <select id="State" class="form-select" style="border-radius:20px" asp-for="State">
+                            <option value="New" style="border-radius:20px">New</option>
+                            <option value="Used">Used</option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <div class="form-text" id="basic-addon4" style="text-align:left">Category</div>
+                        <select id="observedCategory" class="form-select" style="border-radius:20px" asp-for="Category">
+                            <option value="Any" style="border-radius:20px">Any</option>
+                            <option value="Books">Books</option>
+                            <option value="Bikes">Bikes</option>
+                            <option value="Cars">Cars</option>
+                            <option value="Phones">Phones</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-text" id="basic-addon4" style="text-align:left">Description</div>
+                        <textarea class="form-control" style="border-radius:20px" asp-for="Description" placeholder="Enter description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <div class="form-text" id="basic-addon4" style="text-align:left">Image</div>
+                        <input class="form-control" type="file" id="formFile" style="border-radius:20px" asp-for="ImageFile" />
+                        <span asp-validation-for="ImageFile" class="text-danger"></span>
+                    </div>
+                </div>
+                <div hidden class="row mb-3">
+                    <div class="col-md-4 text-center banner">
+                        <strong>New Image</strong>
+                    </div>
+                    <div class="col-sm-8">
+                        <input class="form-file text-center banner2" asp-for="ImageData" />
+                        <span asp-validation-for="ImageData" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col d-grid">
+                        <button type="submit" class="btn btn-outline-primary" style="border-radius:20px" href="/Users/MyItems">Save Changes</button>
+                    </div>
+                    <div class="col d-grid">
+                        <a asp-page="/Users/MyItems" class="btn btn-outline-secondary" style="border-radius:20px">Go back</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

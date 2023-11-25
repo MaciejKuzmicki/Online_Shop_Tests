@@ -1,0 +1,69 @@
+﻿@page
+@model Projekt.CRUD.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="card" style="border-radius:20px">
+    <h2 class=" display-5 fw-bold text-body-emphasis rounded text-center  p-3">Add new Item</h2>
+</div>
+<br />
+
+<div class="card mx-auto text-center" style="padding:20px; border-radius:20px;max-width:500px; align-content:center; margin:auto">
+    <form method="POST" enctype="multipart/form-data">
+        
+        <input class="form-control" style="border-radius:20px" asp-for="Name" placeholder="Enter the name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+        <br />
+
+        <div class="form-text" id="basic-addon4" style="text-align:left">Enter the price</div>
+
+        <input class="form-control" style="border-radius:20px" asp-for="Price" placeholder="Enter the price" />
+        <span asp-validation-for="Price" class="text-danger"></span>
+        <br />
+        <div class="form-text" id="basic-addon4" style="text-align:left">Choose the state</div>
+
+        <select id="State" class="form-select" style="border-radius:20px" asp-for="State">
+            <option value="New" style="border-radius:20px">New</option>
+            <option value="Used">Used</option>
+        </select>
+        <br />
+        
+        <textarea class="form-control" style="border-radius:20px" asp-for="Description" placeholder="Enter description"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+        <br />
+        <div class="form-text" id="basic-addon4" style="text-align:left">Enter the category</div>
+
+        <select id="observedCategory" class="form-select" style="border-radius:20px" asp-for="Category">
+            <option value="Any" style="border-radius:20px">Any</option>
+            <option value="Books">Books</option>
+            <option value="Bikes">Bikes</option>
+            <option value="Cars">Cars</option>
+            <option value="Phones">Phones</option>
+        </select>
+        <br />
+
+        <input class="form-control" type="file" id="formFile" style="border-radius:20px" asp-for="ImageFile" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+        <br />
+
+
+
+
+        <div class="row mb-3">
+            <div class="col d-grid">
+                <button type="submit" class="btn btn-outline-primary" style="border-radius:20px" href="/Users/MyItems">Add Item</button>
+            </div>
+            <div class="col d-grid">
+                <a asp-page="/CRUD/Index" style="border-radius:20px" class="btn btn-outline-secondary">Go back</a>
+            </div>
+        </div>
+
+
+
+    </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

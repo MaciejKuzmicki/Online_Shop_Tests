@@ -1,0 +1,114 @@
+﻿@page
+@model Projekt.Pages.Users.UserItemsModel
+@{
+}
+
+
+
+<div class="container">
+    <div class="card" style="border-radius:20px">
+        <h2 class=" display-5 fw-bold text-body-emphasis rounded text-center  p-3">@Model.UserName items</h2>
+    </div>
+    <br />
+    @if (Model.errorMessage.Length > 0)
+    {
+        <div class='alert alert-warning alert-dismissible fade show text-center' style="border-radius:20px" role='alert'>
+            <strong>@Model.errorMessage</strong>
+            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+        </div>
+    }
+    @if (Model.secondErrorMessage.Length > 0)
+    {
+        <div class='alert alert-warning alert-dismissible fade show text-center' style="border-radius:20px" role='alert'>
+            <strong>@Model.secondErrorMessage</strong>
+            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+        </div>
+    }
+    <div class="row">
+        <div class="col-lg-3">
+            <form>
+                <div class="card" style="border-radius:20px">
+                    <div class="card-body">
+                        <h4 class="text-center">Search</h4>
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" class="form-control form-control-lg" style="border-radius:30px" asp-for="Name" placeholder="Search by title">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Category</label>
+                            <select class="form-select form-select-lg" style="border-radius:30px" asp-for="Category">
+                                <option value="Any">Any</option>
+                                <option value="Books">Books</option>
+                                <option value="Bikes">Bikes</option>
+                                <option value="Cars">Cars</option>
+                                <option value="Phones">Phones</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="row">
+                                <label class="form-label">Price</label>
+                                <div class="col d-grid">
+                                    <input type="number" asp-for="Min" class="form-control" style="border-radius:30px" placeholder="$Min" />
+                                </div>
+
+                                <div class="col d-grid">
+                                    <input type="number" asp-for="Max" class="form-control" style="border-radius:30px" placeholder="$Max" />
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="d-grid">
+                            <button type="submit" style="border-radius:30px" class="btn btn-outline-primary btn-lg">Search</button>
+                        </div>
+                        <div class="d-grid">
+                            <a class="btn btn-outline-secondary btn-lg mt-2" style="border-radius:30px" href="/Users/UserItems" role="button">Clear</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-lg-9">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-0">
+                @if (Model.errors)
+                {
+                    @if (Model.Temp.Count == 0)
+                    {
+                        <div class='alert alert-warning alert-dismissible fade show text-center' style="align-content:center; margin:auto; border-radius:20px" role='alert'>
+                            <strong>@Model.UserName has no items added</strong>
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                        </div>
+                    }
+                    @if (Model.Item.Count == 0 && Model.Temp.Count != 0)
+                    {
+                        <div class='alert alert-warning alert-dismissible fade show text-center' style="align-content:center; margin:auto; border-radius:20px" role='alert'>
+                            <strong>There is no item with given criteria</strong>
+                            <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
+                        </div>
+                    }
+                }
+                @foreach (var item in Model.Item)
+                {
+                    <div class="card" style="height:100%; padding:10px; border-radius:20px">
+                        <img src="data:image/jpg;base64,@item.ImageData" class="image img-fluid" alt="Item Image">
+                        <div class="card-body">
+                            <h5 class="card-title" style="font-family:sans-serif">@item.Name</h5>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item fontItem">State: @item.State</li>
+                                <li class="list-group-item fontItem">Category: @item.Category</li>
+                                <li class="list-group-item fontItem">Price: @(item.Price)$</li>
+                            </ul>
+                        </div>
+                        <div class="d-grid">
+                            <a class="btn btn-outline-primary" style="border-radius:20px" href="/CRUD/Details?id=@(item.Id)" role="button">Details</a>
+                        </div>
+                        <div class="d-grid">
+                            <a class="btn btn-outline-danger mt-2" style="border-radius:20px" href="/CRUD/Delete?id=@(item.Id)" role="button">Delete</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+

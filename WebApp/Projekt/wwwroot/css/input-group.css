@@ -1,0 +1,8 @@
+﻿.input-group {
+    display: flex;
+    align-items: center;
+}
+
+    .input-group input {
+        margin-left: 10px; /* Adjust the margin as needed */
+    }

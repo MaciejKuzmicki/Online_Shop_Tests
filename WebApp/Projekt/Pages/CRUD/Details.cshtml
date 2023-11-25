@@ -1,0 +1,68 @@
+﻿@page
+@model Projekt.CRUD.DetailsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<div class="card" style="border-radius:20px">
+    <h2 class=" display-5 fw-bold text-body-emphasis rounded text-center  p-3">Item Details</h2>
+</div>
+<br />
+
+<div class="card" style="border-radius:20px">
+    <div class="row" style="padding:10px">
+        <div class="col-lg-5" >
+            <img src="data:image/jpg;base64,@Model.Item.ImageData" class="img-fluid" alt="Item Image" style="border-radius:20px; max-height:600px">
+        </div>
+        <div class="col-lg-7">
+            <h2 style="font-family:sans-serif; font-weight:bold;">@Model.Item.Name</h2>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item fontItem">Category: @Model.Item.Category</li>
+                <li class="list-group-item fontItem">State: @Model.Item.State</li>
+                <li class="list-group-item fontItem">Price: @(Model.Item.Price)$</li>
+                <li class="list-group-item fontItem">Description: <br /> @Model.Item.Description</li>
+            </ul>
+            <div class="row mb-3">
+                <div class="col d-grid">
+                    <a type="button" style="border-radius:20px" class="btn btn-outline-secondary" href="/" data-bs-toggle="modal" data-bs-target="#EditModal">Get Contact</a>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="modal fade" id="EditModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="model-header">
+                        <h5 class="modal-title text-center" id="exampleModal">Contact Info</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row mb-2">
+                            <label class="col-sm-4 col-form-label text-center">Name</label>
+                            <div class="col-sm-8">
+                                <label class="form-control text-center" style="border-radius:20px">@Model.UserName</label>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <label class="col-sm-4 col-form-label text-center">E-mail</label>
+                            <div class="col-sm-8">
+                                <label class="form-control text-center" style="border-radius:20px">@Model.UserEmail</label>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-2">
+                            <label class="col-sm-4 col-form-label text-center">Phone Number</label>
+                            <div class="col-sm-8">
+                                <label class="form-control text-center" style="border-radius:20px">@Model.UserPhoneNumber</label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
