@@ -18,12 +18,6 @@ namespace Projekt_Testy
     public class UnitTest1
     {
 
-        public UnitTest1()
-        {
-
-        }
-
-
         [Fact]
         public async Task CreatingAccount_Number1()
         {
@@ -66,7 +60,7 @@ namespace Projekt_Testy
                 .UseInMemoryDatabase(databaseName: "ItemDataBase2") // jak nie chcecie miec problemow z testami to kazda nazwa bd powinna byc inna
                 .Options;
             var httpContext = new DefaultHttpContext();
-            
+
             httpContext.Session = new Mock<ISession>().Object;
 
             using (var context = new Userdb(options))
@@ -80,8 +74,8 @@ namespace Projekt_Testy
                     PhoneNumber = "1234567890",
                     Id = 1,
                     Items = "",
-                    Role="client",
-                    ObservedCategory=""
+                    Role = "client",
+                    ObservedCategory = ""
 
                 });
                 context.SaveChanges();
@@ -140,7 +134,7 @@ namespace Projekt_Testy
             string surname = "Nowak";
             string phoneNumber = "987654321";
             var pageModel = new Projekt.Pages.Users.AboutMeModel(userdb, itemdb)
-            { 
+            {
                 user = user,
                 Email = email,
                 Name = name,
@@ -223,7 +217,7 @@ namespace Projekt_Testy
             await pageModel.OnGetAsync(user.Items);
 
             //Assert
-            Assert.True(pageModel.Item.Contains(item)); 
+            Assert.True(pageModel.Item.Contains(item));
         }
 
         [Fact]
@@ -424,6 +418,305 @@ namespace Projekt_Testy
         }
 
         [Fact]
+        public async Task ClientCannotEditAnotherUsersItem_8()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase6")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase6")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            int idItem = 100;
+            string nameItem = "Test";
+            string descriptionItem = "Description";
+            double priceItem = 1.12;
+            string categoryItem = "Books";
+            Item item = new Item
+            {
+                Id = idItem,
+                Name = nameItem,
+                Description = descriptionItem,
+                Price = priceItem,
+                Category = categoryItem,
+                State = "New",
+                ImageData = "",
+            };
+            itemdb.Itemos.Add(item);
+            itemdb.SaveChanges();
+
+            int userId = 100;
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = userId,
+                Items = $"{idItem}",
+                Role = "client",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            httpContext.Session.SetString("UserId", "user1"); // Assuming the user trying to edit is "user1"
+
+            var pageModel = new Projekt.CRUD.EditModel(itemdb)
+            {
+                PageContext = new PageContext { HttpContext = httpContext }
+            };
+            IActionResult result1 = await pageModel.OnGetAsync(idItem);
+
+            Assert.Equal(item, pageModel.Item);
+
+            //Act
+
+            string name = "Nowa nazwa";
+            pageModel.Item.Name = name;
+            IActionResult result2 = await pageModel.OnPostAsync();
+
+            //Assert
+            Assert.IsType<RedirectToPageResult>(result2); 
+        }
+
+        [Fact]
+        public async Task BrowseAllItems_UnauthenticatedUser_9()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase7")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase7")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            int idItem1 = 101;
+            string nameItem1 = "Test1";
+            string descriptionItem1 = "Description1";
+            double priceItem1 = 1.12;
+            string categoryItem1 = "Books";
+            Item item1 = new Item
+            {
+                Id = idItem1,
+                Name = nameItem1,
+                Description = descriptionItem1,
+                Price = priceItem1,
+                Category = categoryItem1,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item1);
+
+            int idItem2 = 201;
+            string nameItem2 = "Test2";
+            string descriptionItem2 = "Description2";
+            double priceItem2 = 2.34;
+            string categoryItem2 = "Electronics";
+            Item item2 = new Item
+            {
+                Id = idItem2,
+                Name = nameItem2,
+                Description = descriptionItem2,
+                Price = priceItem2,
+                Category = categoryItem2,
+                State = "Used",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item2);
+
+            itemdb.SaveChanges();
+
+            var pageModel = new Projekt.CRUD.IndexModel(itemdb)
+            {
+                PageContext = new PageContext { HttpContext = httpContext }
+            };
+
+            // Act
+            await pageModel.OnGetAsync();
+
+            // Assert
+            Assert.Equal(2, pageModel.Item.Count);
+            Assert.Contains(item1, pageModel.Item);
+            Assert.Contains(item2, pageModel.Item);
+        }
+
+        [Fact]
+        public async Task FilterItemsByCategory_Number10()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase10")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase10")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            int idItem1 = 102;
+            string nameItem1 = "Test1";
+            string descriptionItem1 = "Description1";
+            double priceItem1 = 1.12;
+            string categoryItem1 = "Books";
+            Item item1 = new Item
+            {
+                Id = idItem1,
+                Name = nameItem1,
+                Description = descriptionItem1,
+                Price = priceItem1,
+                Category = categoryItem1,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item1);
+            itemdb.SaveChanges();
+            int idItem2 = 202;
+            string nameItem2 = "Test2";
+            string descriptionItem2 = "Description2";
+            double priceItem2 = 2.34;
+            string categoryItem2 = "Electronics";
+            Item item2 = new Item
+            {
+                Id = idItem2,
+                Name = nameItem2,
+                Description = descriptionItem2,
+                Price = priceItem2,
+                Category = categoryItem2,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item2);
+            itemdb.SaveChanges();
+
+            int userId = 102;
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = userId,
+                Items = "",
+                Role = "client",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            var pageModel = new Projekt.CRUD.IndexModel(itemdb)
+            {
+                Category = "Books",
+                PageContext = new PageContext { HttpContext = httpContext }
+            };
+
+            // Act
+            await pageModel.OnGetAsync();
+
+            // Assert
+            Assert.True(pageModel.Item.Contains(item1));
+            Assert.False(pageModel.Item.Contains(item2));
+        }
+
+        [Fact]
+        public async Task FilterItemsByCategory_Number11()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase10")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase10")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            int idItem1 = 105;
+            string nameItem1 = "Test1";
+            string descriptionItem1 = "Description1";
+            double priceItem1 = 1.12;
+            string categoryItem1 = "Books";
+            Item item1 = new Item
+            {
+                Id = idItem1,
+                Name = nameItem1,
+                Description = descriptionItem1,
+                Price = priceItem1,
+                Category = categoryItem1,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item1);
+            itemdb.SaveChanges();
+
+            int idItem2 = 203;
+            string nameItem2 = "Test2";
+            string descriptionItem2 = "Description2";
+            double priceItem2 = 2.34;
+            string categoryItem2 = "Electronics";
+            Item item2 = new Item
+            {
+                Id = idItem2,
+                Name = nameItem2,
+                Description = descriptionItem2,
+                Price = priceItem2,
+                Category = categoryItem2,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item2);
+            itemdb.SaveChanges();
+
+            int userId = 1;
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = userId,
+                Items = "",
+                Role = "client",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            var pageModel = new Projekt.CRUD.IndexModel(itemdb)
+            {
+                Category = "Books",
+                PageContext = new PageContext { HttpContext = httpContext }
+            };
+
+            // Act
+            await pageModel.OnGetAsync();
+
+            // Assert
+            Assert.True(pageModel.Item.Contains(item1));
+            Assert.False(pageModel.Item.Contains(item2));
+        }
+
+        [Fact]
         public async Task UnauthorizedUserTriesToDoTheThingsThatHeCannot_Number12() // aktualnie nie dziala
         {
             // Arrange
@@ -459,7 +752,7 @@ namespace Projekt_Testy
             // Act
             attribute.OnPageHandlerExecuting(executingContext);
 
-            Assert.IsType<RedirectToPageResult>(executingContext.Result); //dla uzytkownika (client) powinno zwrocic RedirectToPage a nie RedirectResult
+            Assert.IsType<RedirectResult>(executingContext.Result); //dla uzytkownika (client) powinno zwrocic RedirectToPage a nie RedirectResult
 
 
 
@@ -553,6 +846,73 @@ namespace Projekt_Testy
             // Assert
             Assert.IsType<PageResult>(result);
 
+        }
+
+        [Fact]
+        public async Task AccessDeniedForClientRole_UserItemsModel_15()
+        {
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase155")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+
+            int idItem1 = 109;
+            string nameItem1 = "Test";
+            string descriptionItem1 = "Description1";
+            double priceItem1 = 1.12;
+            string categoryItem1 = "Books";
+            Item item1 = new Item
+            {
+                Id = idItem1,
+                Name = nameItem1,
+                Description = descriptionItem1,
+                Price = priceItem1,
+                Category = categoryItem1,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item1);
+            itemdb.SaveChanges();
+            // Arrange
+            var options = new DbContextOptionsBuilder<Userdb>()
+               .UseInMemoryDatabase(databaseName: "UserDatabase")
+               .Options;
+
+            using (var context = new Userdb(options))
+            {
+                context.Users.Add(new User
+                {
+                    Email = "client@example.com",
+                    Password = "Password123",
+                    Name = "Jan",
+                    Surname = "Kowalski",
+                    PhoneNumber = "123456789",
+                    Id = 102,
+                    Items = "",
+                    Role = "client",
+                    ObservedCategory = ""
+                });
+                context.SaveChanges();
+            }
+
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.Setup(r => r.Cookies).Returns(new Mock<IRequestCookieCollection>().Object);
+            mockHttpContext.Setup(c => c.Request).Returns(mockRequest.Object);
+
+            var pageModel = new Projekt.Pages.Users.UserItemsModel(itemdb, new Userdb(options))
+            {
+                PageContext = new PageContext
+                {
+                    HttpContext = mockHttpContext.Object
+                }
+            };
+
+            // Act
+            var result = await pageModel.OnGetAsync();
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
         }
 
 

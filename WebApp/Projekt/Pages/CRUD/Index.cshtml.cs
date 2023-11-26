@@ -26,6 +26,8 @@ namespace Projekt.CRUD
         public IndexModel(Itemdb context)
         {
             _context = context;
+            Item = new List<Item>();
+            Temp = new List<Item>();
         }
 
         public IList<Item> Item { get;set; } = default!;
