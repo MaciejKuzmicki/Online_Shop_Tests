@@ -49,15 +49,21 @@ namespace Projekt.Pages.Users
             _itemContext = itemContext;
         }
 
-        public async Task<IActionResult> OnPostAsync(int? Id)
+        public async Task<IActionResult> OnPostAsync(int? Id, string action = null)
         {
-            string submitButton = Request.Form["action"];
-            Id = HttpContext.Session.GetInt32("Id");
+            if (action is null)
+            {
+                action = Request.Form["action"];
+            }
+            if (Id is null)
+            {
+                Id = HttpContext.Session.GetInt32("Id");
+            }
 
             var item = _context.Users.FirstOrDefault(m => m.Id == Id);
 
 
-            if (submitButton.Equals("profile"))
+            if (action.Equals("profile"))
             {
                 item.Name = Name;
                 item.Surname = Surname;
@@ -73,7 +79,7 @@ namespace Projekt.Pages.Users
                 HttpContext.Session.SetString("ObservedCategory", item.ObservedCategory);
 
             }
-            else if (submitButton.Equals("password"))
+            else if (action.Equals("password"))
             {
                 if (Password == null || ConfirmPassword == null)
                 {
@@ -93,7 +99,7 @@ namespace Projekt.Pages.Users
                     HttpContext.Session.SetString("Password", item.Password);
                 }
             }
-            else if(submitButton.Equals("delete"))
+            else if(action.Equals("delete"))
             {
                 OldPassword = HttpContext.Session.GetString("Password") ?? "";
                 await Console.Out.WriteLineAsync("OLD PASSWORD: " + OldPassword);

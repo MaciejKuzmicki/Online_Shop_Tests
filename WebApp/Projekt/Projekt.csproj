@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Migrations\ItemdbMigrations\" />
     <Folder Include="wwwroot\images\items\" />
   </ItemGroup>
 

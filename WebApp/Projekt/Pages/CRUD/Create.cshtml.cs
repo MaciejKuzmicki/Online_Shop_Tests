@@ -45,10 +45,12 @@ namespace Projekt.CRUD
 
         public String ImageData { get; set; }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(string email = null)
         {
-
-            String Email = HttpContext.Session.GetString("Email") ?? "";
+            if (email is null)
+            {
+                email = HttpContext.Session.GetString("Email") ?? "";
+            }
 
             
 
@@ -70,7 +72,7 @@ namespace Projekt.CRUD
 
             foreach (var user in _userContext.Users)
             {
-                if(user.Email.Equals(Email))
+                if(user.Email.Equals(email))
                 {
                     user.Items += ":" + Item.Id;
 					HttpContext.Session.SetString("Items", user.Items);

@@ -31,17 +31,22 @@ namespace Projekt.Pages.Users
 		{
 			_context = context;
 			_userContext = userContext;
+			Item = new List<Item>();
+			Temp = new List<Item>();
 		}
 
-		public IList<Item> Item { get; set; } = default!;
-		public IList<Item> Temp { get; set; } = default!;
+		public IList<Item> Item { get; set; }
+		public IList<Item> Temp { get; set; }
 		public IList<Item> TempTemp { get; set; } = default!;
 
 
 
-		public async Task OnGetAsync()
+		public async Task OnGetAsync(string? listOfItems = null)
 		{
-            String listOfItems = HttpContext.Session.GetString("Items") ?? "";
+			if (listOfItems is null)
+			{
+                listOfItems = HttpContext.Session.GetString("Items") ?? "";
+            }
 			IList<int> itemsId = new List<int>();
             string[] parts = listOfItems.Split(':');
 			foreach (string part in parts)
@@ -73,7 +78,8 @@ namespace Projekt.Pages.Users
 				TempTemp = await _context.Itemos.ToListAsync();
 				foreach (var item in TempTemp)
 				{
-					if (itemsId.Contains(item.Id)) Temp.Add(item);
+					if (itemsId.Contains(item.Id)) 
+						Temp.Add(item);
 				}
 				if (Category.Equals("Any") && Search == null) 
 				{ 
@@ -119,8 +125,6 @@ namespace Projekt.Pages.Users
                         Item.RemoveAt(i);
                     }
                 }
-				
-
             }
 		}
 	}
