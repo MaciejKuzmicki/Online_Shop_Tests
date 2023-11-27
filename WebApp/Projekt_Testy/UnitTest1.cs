@@ -12,6 +12,7 @@ using Projekt;
 using Projekt.Authentication;
 using System;
 using System.Net.Http;
+using System.Security.Claims;
 
 namespace Projekt_Testy
 {
@@ -914,6 +915,363 @@ namespace Projekt_Testy
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
+
+        [Fact]
+        public async Task AdminCannotEditClientsItem_16()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase6")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase6")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            int idItem = 142;
+            string nameItem = "Test";
+            string descriptionItem = "Description";
+            double priceItem = 1.12;
+            string categoryItem = "Books";
+            Item item = new Item
+            {
+                Id = idItem,
+                Name = nameItem,
+                Description = descriptionItem,
+                Price = priceItem,
+                Category = categoryItem,
+                State = "New",
+                ImageData = "",
+            };
+            itemdb.Itemos.Add(item);
+            itemdb.SaveChanges();
+
+            int userId = 142;
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = userId,
+                Items = $"{idItem}",
+                Role = "client",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+            int adminUserId = 143;
+            User adminUser = new User
+            {
+                Email = "admin@example.com",
+                Password = "Password123",
+                Name = "Adam",
+                Surname = "Adminowicz",
+                PhoneNumber = "987654321",
+                Id = adminUserId,
+                Items = $"",
+                Role = "admin",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(adminUser);
+            userdb.SaveChanges();
+
+            httpContext.Session.SetString("UserId", $"{adminUserId}"); // Assuming the user trying to edit is "user1"
+
+            var pageModel = new Projekt.CRUD.EditModel(itemdb)
+            {
+                PageContext = new PageContext { HttpContext = httpContext }
+            };
+            IActionResult result1 = await pageModel.OnGetAsync(idItem);
+
+            Assert.Equal(item, pageModel.Item);
+
+            //Act
+
+            string name = "Nowa nazwa";
+            pageModel.Item.Name = name;
+            IActionResult result2 = await pageModel.OnPostAsync();
+
+            //Assert
+            Assert.IsType<RedirectToPageResult>(result2);
+        }
+
+        [Fact]
+        public async Task OtherUserCannotEditUserData_Number17()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase3")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase3")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = 242,
+                Items = "",
+                Role = "client",
+                ObservedCategory = ""
+            };
+
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            var otherUserId = 243;
+
+            User otherUser = new User
+            {
+                Email = "other_user@example.com",
+                Password = "Password123",
+                Name = "Inny",
+                Surname = "Ininowicz",
+                PhoneNumber = "987654321",
+                Id = otherUserId,
+                Items = "",
+                Role = "client",
+                ObservedCategory = ""
+            };
+
+            userdb.Users.Add(otherUser);
+            userdb.SaveChanges();
+
+            string email = "newusermail@example.com";
+            string name = "Adam";
+            string surname = "Nowak";
+            string phoneNumber = "987654321";
+
+            httpContext.Session.SetString("UserId", $"{otherUserId}");
+
+            var pageModel = new Projekt.Pages.Users.AboutMeModel(userdb, itemdb)
+            {
+                user = user,
+                Email = email,
+                Name = name,
+                Surname = surname,
+                PhoneNumber = phoneNumber,
+                ObservedCategory = ""
+            };
+            pageModel.PageContext = new PageContext { HttpContext = httpContext };
+
+            //Act
+            var result = await pageModel.OnPostAsync(242, "profile");
+
+            //Assert
+            Assert.IsType<PageResult>(result);
+        
+        }
+
+        [Fact]
+        public async Task AdminCanViewUserItems_Number18()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase4")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase4")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            int idItem = 342;
+            string nameItem = "Test";
+            string descriptionItem = "Description";
+            double priceItem = 1.12;
+            string categoryItem = "Books";
+            Item item = new Item
+            {
+                Id = idItem,
+                Name = nameItem,
+                Description = descriptionItem,
+                Price = priceItem,
+                Category = categoryItem,
+                State = "New",
+                ImageData = ""
+            };
+            itemdb.Itemos.Add(item);
+            itemdb.SaveChanges();
+
+            int userId = 343;
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = userId,
+                Items = $"{idItem}",
+                Role = "client",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            int adminUserId = 344;
+            User adminUser = new User
+            {
+                Email = "admin@example.com",
+                Password = "Password123",
+                Name = "Adam",
+                Surname = "Adminowski",
+                PhoneNumber = "987654321",
+                Id = adminUserId,
+                Items = $"",
+                Role = "admin",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(adminUser);
+            userdb.SaveChanges();
+
+            httpContext.Session.SetString("UserId", $"{adminUserId}");
+
+            var pageModel = new Projekt.Pages.Users.MyItemsModel(itemdb, userdb)
+            {
+                Category = "Any",
+                PageContext = new PageContext { HttpContext = httpContext }
+            };
+
+            //Act
+            await pageModel.OnGetAsync(user.Items);
+
+            //Assert
+            Assert.True(pageModel.Item.Contains(item));
+        }
+
+        [Fact]
+        public async Task AdminCanDeleteUser_Number19()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase3")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase3")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = 442,
+                Items = "",
+                Role = "client",
+                ObservedCategory = ""
+            };
+
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            int adminUserId = 443;
+            User adminUser = new User
+            {
+                Email = "admin@example.com",
+                Password = "Password123",
+                Name = "Adam",
+                Surname = "Adminowski",
+                PhoneNumber = "987654321",
+                Id = adminUserId,
+                Items = $"",
+                Role = "admin",
+                ObservedCategory = ""
+            };
+            userdb.Users.Add(adminUser);
+            userdb.SaveChanges();
+
+            httpContext.Session.SetString("UserId", $"{adminUserId}");
+
+            var aboutMeModel = new Projekt.Pages.Users.AboutMeModel(userdb, itemdb);
+            aboutMeModel.PageContext = new PageContext { HttpContext = httpContext };
+
+            //Act
+            await aboutMeModel.OnPostAsync(442, "delete");
+
+            // Assert
+            var userFromDb = await userdb.Users.FindAsync(442);
+
+            //Assert
+            Assert.Null(userFromDb);
+        }
+
+        [Fact]
+        public async Task UserCanViewHisData_Number20()
+        {
+            // Arrange
+            var optionsUser = new DbContextOptionsBuilder<Userdb>()
+                .UseInMemoryDatabase(databaseName: "UserDataBase3")
+                .Options;
+            Userdb userdb = new Userdb(optionsUser);
+            var optionsItem = new DbContextOptionsBuilder<Itemdb>()
+                .UseInMemoryDatabase(databaseName: "ItemDataBase3")
+                .Options;
+            Itemdb itemdb = new Itemdb(optionsItem);
+            var httpContext = new DefaultHttpContext();
+
+            httpContext.Session = new Mock<ISession>().Object;
+
+            var userId = 542;
+
+            User user = new User
+            {
+                Email = "user@example.com",
+                Password = "Password123",
+                Name = "Jan",
+                Surname = "Kowalski",
+                PhoneNumber = "123456789",
+                Id = userId,
+                Items = "",
+                Role = "client",
+                ObservedCategory = "someCategory"
+            };
+
+            userdb.Users.Add(user);
+            userdb.SaveChanges();
+
+            // Simulate a request with the appropriate user ID
+            httpContext.Request.QueryString = new QueryString($"?id={userId}");
+
+            var pageModel = new Projekt.Pages.Users.DetailsModel(userdb);
+            pageModel.PageContext = new PageContext { HttpContext = httpContext };
+
+            // Act
+            var result = await pageModel.OnGetAsync(userId);
+
+            // Assert
+            Assert.IsType<PageResult>(result);
+            Assert.Equal(user.Email, pageModel.User.Email);
+            Assert.Equal(user.Name, pageModel.User.Name);
+            Assert.Equal(user.Surname, pageModel.User.Surname);
+            Assert.Equal(user.PhoneNumber, pageModel.User.PhoneNumber);
+        }
+
 
 
     }
